@@ -18,6 +18,11 @@ MODEL = "deepseek-ai/deepseek-r1-0528-qwen3-8b"  # Free model on OpenRouter
 if not OPENROUTER_API_KEY:
     raise ValueError("OPENROUTER_API_KEY not found in environment variables")
 
+# Debug: Print environment variables
+print("\n=== Environment Variables ===")
+print(f"OPENROUTER_API_KEY: {'*' * 8}{OPENROUTER_API_KEY[-4:] if OPENROUTER_API_KEY else 'None'}")
+print("===========================\n")
+
 chat_history = []
 
 @app.route('/')
