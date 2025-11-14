@@ -104,3 +104,52 @@ button:active {
 ::-webkit-scrollbar-thumb:hover {
     background: #a5b4fc;
 }
+
+/* Voice status indicator */
+.voice-status {
+    animation: slideDown 0.3s ease-out;
+    border-left: 3px solid;
+}
+
+.voice-status.listening {
+    border-left-color: #ef4444;
+}
+
+.voice-status.error {
+    border-left-color: #dc2626;
+}
+
+.voice-status.info {
+    border-left-color: #3b82f6;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Voice button pulse animation */
+@keyframes pulse-ring {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+.voice-btn-listening {
+    animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

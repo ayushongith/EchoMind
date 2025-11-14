@@ -25,10 +25,11 @@
             <div class="flex gap-2">
                 <input type="text" id="user-input" 
                        class="flex-1 p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                       placeholder="Type your message here...">
+                       placeholder="Type your message or click the microphone to speak...">
                 
                 <button id="voice-btn" 
-                        class="bg-indigo-500 hover:bg-indigo-600 text-white p-3 rounded-lg transition-colors">
+                        class="bg-indigo-500 hover:bg-indigo-600 text-white p-3 rounded-lg transition-colors"
+                        title="Click to start voice input (or press Space)">
                     <i class="fas fa-microphone"></i>
                 </button>
                 
@@ -36,6 +37,15 @@
                         class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
                     Send
                 </button>
+            </div>
+            
+            <div class="text-xs text-gray-500 mt-2 text-center">
+                <i class="fas fa-info-circle mr-1"></i>
+                Tip: Press <kbd class="px-1 py-0.5 bg-gray-200 rounded">Space</kbd> to toggle voice input
+                <span class="block mt-1 text-green-600">
+                    <i class="fas fa-check-circle mr-1"></i>
+                    Using backend Whisper transcription (works offline, no Google API needed)
+                </span>
             </div>
 
             <audio id="audio-player" class="w-full mt-4" controls></audio>

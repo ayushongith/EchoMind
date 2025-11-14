@@ -5,6 +5,9 @@ import base64
 from io import BytesIO
 import requests
 from dotenv import load_dotenv
+from stt_engine import STTEngine
+import tempfile
+import speech_recognition as sr
 
 app = Flask(__name__)
 
@@ -24,6 +27,9 @@ print(f"OPENROUTER_API_KEY: {'*' * 8}{OPENROUTER_API_KEY[-4:] if OPENROUTER_API_
 print("===========================\n")
 
 chat_history = []
+
+# Initialize STT engine for backend voice recognition
+stt_engine = STTEngine(model_name="whisper")
 
 @app.route('/')
 def home():
@@ -119,6 +125,69 @@ def process_input():
     except Exception as e:
         import traceback
         error_msg = f"Error: {str(e)}\n{traceback.format_exc()}"
+        print(error_msg)
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/transcribe_audio', methods=['POST'])
+def transcribe_audio():
+    """Transcribe audio using backend Whisper STT engine."""
+    try:
+        if 'audio' not in request.files:
+            return jsonify({'error': 'No audio file provided'}), 400
+        
+        audio_file = request.files['audio']
+        if audio_file.filename == '':
+            return jsonify({'error': 'No audio file selected'}), 400
+        
+        # Save uploaded audio to temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.webm') as temp_audio:
+            audio_file.save(temp_audio.name)
+            temp_audio_path = temp_audio.name
+        
+        try:
+            # Use speech_recognition to process the audio
+            recognizer = sr.Recognizer()
+            
+            # Convert audio file to format recognized by speech_recognition
+            from pydub import AudioSegment
+            
+            # Load audio file (handles webm, mp3, wav, etc.)
+            audio_segment = AudioSegment.from_file(temp_audio_path)
+            
+            # Convert to WAV format (16kHz, mono) for Whisper
+            wav_io = BytesIO()
+            audio_segment.export(wav_io, format="wav")
+            wav_io.seek(0)
+            
+            # Use Whisper for transcription
+            with sr.AudioFile(wav_io) as source:
+                audio_data = recognizer.record(source)
+                text = recognizer.recognize_whisper(
+                    audio_data,
+                    model="base",
+                    language="english"
+                )
+            
+            print(f"Transcribed text: {text}")
+            return jsonify({'text': text.strip()})
+            
+        except sr.UnknownValueError:
+            return jsonify({'error': 'Could not understand audio. Please speak more clearly.'}), 400
+        except sr.RequestError as e:
+            return jsonify({'error': f'Speech recognition service error: {str(e)}'}), 500
+        except Exception as e:
+            print(f"Transcription error: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return jsonify({'error': f'Transcription failed: {str(e)}'}), 500
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_audio_path):
+                os.unlink(temp_audio_path)
+                
+    except Exception as e:
+        import traceback
+        error_msg = f"Error processing audio: {str(e)}\n{traceback.format_exc()}"
         print(error_msg)
         return jsonify({'error': str(e)}), 500
 
