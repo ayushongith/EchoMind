@@ -13,7 +13,7 @@ load_dotenv()
 
 # Configure OpenRouter API
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY')
-MODEL = "deepseek-ai/deepseek-r1-0528-qwen3-8b"  # Free model on OpenRouter
+MODEL = "openai/gpt-3.5-turbo"  # Standard model on OpenRouter
 
 if not OPENROUTER_API_KEY:
     raise ValueError("OPENROUTER_API_KEY not found in environment variables")
@@ -111,8 +111,6 @@ def process_input():
                     'audio': None,
                     'error': f"Text-to-speech error: {str(tts_error)}"
                 })
-            else:
-                raise Exception("Unexpected response format from OpenRouter")
         else:
             error_msg = f"OpenRouter API error: {response.status_code} - {response.text}"
             print(error_msg)
